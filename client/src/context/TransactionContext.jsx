@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import { ethers } from "ethers";
 
 import { contractABI, contractAddress } from "../utils/constants";
 
-export const TransactionContext = React.createContext();
+export const TransactionContext = createContext();
+
+import useFetch from "../hooks/useFetch";
 
 const { ethereum } = window;
 
@@ -19,7 +21,7 @@ export const TransactionsProvider = ({ children }) => {
   const [formData, setformData] = useState({ addressTo: "", amount: "", keyword: "", message: "" });
   const [currentAccount, setCurrentAccount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [transactionCount, setTransactionCount] = useState(localStorage.getItem("transactionCount"));
+  const [transactionCount, setTransactionCount] = useState(localStorage.getItem("transactionsCount"));
   const [transactions, setTransactions] = useState([]);
 
   const handleChange = (e, name) => {
@@ -42,7 +44,6 @@ export const TransactionsProvider = ({ children }) => {
           amount: parseInt(transaction.amount._hex) / (10 ** 18)
         }));
 
-        console.log(structuredTransactions);
 
         setTransactions(structuredTransactions);
       } else {
@@ -75,7 +76,7 @@ export const TransactionsProvider = ({ children }) => {
     try {
       if (ethereum) {
         const transactionsContract = createEthereumContract();
-        const currentTransactionCount = await transactionsContract.getTransactionCount();
+        const currentTransactionCount = await transactionsContract.transactionsCount();
 
         window.localStorage.setItem("transactionCount", currentTransactionCount);
       }
@@ -93,7 +94,8 @@ export const TransactionsProvider = ({ children }) => {
       const accounts = await ethereum.request({ method: "eth_requestAccounts", });
 
       setCurrentAccount(accounts[0]);
-      window.location.reload();
+      console.log(currentAccount)
+    
     } catch (error) {
       console.log(error);
 
@@ -102,8 +104,11 @@ export const TransactionsProvider = ({ children }) => {
   };
 
   const sendTransaction = async () => {
+
     try {
+      
       if (ethereum) {
+        console.log("ethereum")
         const { addressTo, amount, keyword, message } = formData;
         const transactionsContract = createEthereumContract();
         const parsedAmount = ethers.utils.parseEther(amount);
@@ -131,7 +136,7 @@ export const TransactionsProvider = ({ children }) => {
         setTransactionCount(transactionsCount.toNumber());
         window.location.reload();
       } else {
-        console.log("No ethereum object");
+        console.error("error")
       }
     } catch (error) {
       console.log(error);
