@@ -15,7 +15,7 @@
 
 ## Setting Up
 ### 1. Clone/Download the Repository
-`git clone` (https://github.com/yashje/Ticketmaster_Clone)
+`git clone https://github.com/yashje/Ticketmaster_Clone`
 
 ### 2. Install Dependencies:
 `$ npm install`
